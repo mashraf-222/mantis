@@ -108,6 +108,7 @@ public class SampleArchaiusMrePublishConfiguration implements MrePublishConfigur
     private final Property<Integer> workerPoolWorkerErrorTimeoutSec;
 
     private static final Logger LOG = LoggerFactory.getLogger(SampleArchaiusMrePublishConfiguration.class);
+    private final int cachedFlushIntervalBytes;
 
     public SampleArchaiusMrePublishConfiguration(final PropertyRepository propertyRepository) {
         this.propRepo = propertyRepository;
@@ -183,6 +184,8 @@ public class SampleArchaiusMrePublishConfiguration implements MrePublishConfigur
         this.flushIntervalBytes =
                 propRepo.get(CHANNEL_FLUSH_INTERVAL_BYTES, Integer.class)
                         .orElse(512 * 1024);    // 500 KiB
+        // Cache primitive value to avoid repeated Property.get() overhead on hot-paths.
+        this.cachedFlushIntervalBytes = this.flushIntervalBytes.get();
         this.lowWriteBufferWatermark =
                 propRepo.get(CHANNEL_LOW_WRITE_BUFFER_WATERMARK_BYTES, Integer.class)
                         .orElse(1572864);       // 1.5 MiB
@@ -367,7 +370,7 @@ public class SampleArchaiusMrePublishConfiguration implements MrePublishConfigur
 
     @Override
     public int getFlushIntervalBytes() {
-        return flushIntervalBytes.get();
+        return cachedFlushIntervalBytes;
     }
 
     @Override
