@@ -111,102 +111,104 @@ public class SampleArchaiusMrePublishConfiguration implements MrePublishConfigur
 
     public SampleArchaiusMrePublishConfiguration(final PropertyRepository propertyRepository) {
         this.propRepo = propertyRepository;
+        // cache the repository reference locally to avoid repeated field dereferences
+        final PropertyRepository repo = this.propRepo;
 
         this.mreClientEnabled =
-                propertyRepository.get(MRE_CLIENT_ENABLED_PROP, Boolean.class)
+                repo.get(MRE_CLIENT_ENABLED_PROP, Boolean.class)
                         .orElse(true);
         this.appName =
-                propertyRepository.get(MRE_CLIENT_APP_NAME_PROP, String.class)
+                repo.get(MRE_CLIENT_APP_NAME_PROP, String.class)
                         .orElse("unknownApp");
         this.mreClientTeeEnabled =
-                propertyRepository.get(MRE_CLIENT_TEE_ENABLED_PROP, Boolean.class)
+                repo.get(MRE_CLIENT_TEE_ENABLED_PROP, Boolean.class)
                         .orElse(false);
         this.mreClientTeeStreamName =
-                propertyRepository.get(MRE_CLIENT_TEE_STREAM_NAME_PROP, String.class)
+                repo.get(MRE_CLIENT_TEE_STREAM_NAME_PROP, String.class)
                         .orElse("default_stream");
         this.blacklistedKeys =
-                propertyRepository.get(MRE_CLIENT_BLACKLIST_KEYS_PROP, String.class)
+                repo.get(MRE_CLIENT_BLACKLIST_KEYS_PROP, String.class)
                         .orElse("param.password");
 
         this.maxNumWorkersForSubsRefresh =
-                propertyRepository.get(MAX_NUM_WORKERS_FOR_SUB_REFRESH, Integer.class)
+                repo.get(MAX_NUM_WORKERS_FOR_SUB_REFRESH, Integer.class)
                         .orElse(3);
         this.maxNumStreams =
-                propertyRepository.get(MAX_NUM_STREAMS_NAME, Integer.class)
+                repo.get(MAX_NUM_STREAMS_NAME, Integer.class)
                         .orElse(5);
         this.streamInactiveDurationThreshold =
-                propertyRepository.get(STREAM_INACTIVE_DURATION_THRESHOLD_NAME, Long.class)
+                repo.get(STREAM_INACTIVE_DURATION_THRESHOLD_NAME, Long.class)
                         .orElse(24L * 60L * 60L);
         this.maxSubscriptionCount =
-                propertyRepository.get(MAX_SUBSCRIPTIONS_COUNT_PROP, Integer.class)
+                repo.get(MAX_SUBSCRIPTIONS_COUNT_PROP, Integer.class)
                         .orElse(20);
         this.deepCopyEventMapEnabled =
-                propertyRepository.get(DEEPCOPY_EVENT_MAP_ENABLED_PROP, Boolean.class)
+                repo.get(DEEPCOPY_EVENT_MAP_ENABLED_PROP, Boolean.class)
                                   .orElse(true);
 
-        jobClusterByStreamType.put(StreamType.DEFAULT_EVENT_STREAM, propRepo.get(PUBLISH_JOB_CLUSTER_PROP_PREFIX + StreamType.DEFAULT_EVENT_STREAM, String.class)
+        jobClusterByStreamType.put(StreamType.DEFAULT_EVENT_STREAM, repo.get(PUBLISH_JOB_CLUSTER_PROP_PREFIX + StreamType.DEFAULT_EVENT_STREAM, String.class)
                 .orElse("SharedMrePublishEventSource"));
-        jobClusterByStreamType.put(StreamType.LOG_EVENT_STREAM, propRepo.get(PUBLISH_JOB_CLUSTER_PROP_PREFIX + StreamType.LOG_EVENT_STREAM, String.class)
+        jobClusterByStreamType.put(StreamType.LOG_EVENT_STREAM, repo.get(PUBLISH_JOB_CLUSTER_PROP_PREFIX + StreamType.LOG_EVENT_STREAM, String.class)
                 .orElse("SharedPushLogEventSource"));
-        this.drainerIntervalMSecProp = propRepo.get(DRAINER_INTERVAL_MSEC_PROP, Integer.class)
+        this.drainerIntervalMSecProp = repo.get(DRAINER_INTERVAL_MSEC_PROP, Integer.class)
                 .orElse(100);
-        this.jobDiscoveryRefreshIntervalSecProp = propRepo.get(JOB_DISCOVERY_REFRESH_INTERVAL_SEC_PROP, Integer.class)
+        this.jobDiscoveryRefreshIntervalSecProp = repo.get(JOB_DISCOVERY_REFRESH_INTERVAL_SEC_PROP, Integer.class)
                 .orElse(10);
-        this.jobClusterMappingRefreshIntervalSecProp = propRepo.get(JOB_CLUSTER_MAPPING_REFRESH_INTERVAL_SEC_PROP, Integer.class)
+        this.jobClusterMappingRefreshIntervalSecProp = repo.get(JOB_CLUSTER_MAPPING_REFRESH_INTERVAL_SEC_PROP, Integer.class)
                 .orElse(60);
-        this.subscriptionRefreshIntervalSecProp = propRepo.get(SUBS_REFRESH_INTERVAL_SEC_PROP, Integer.class)
+        this.subscriptionRefreshIntervalSecProp = repo.get(SUBS_REFRESH_INTERVAL_SEC_PROP, Integer.class)
                 .orElse(1);
-        this.subscriptionExpiryIntervalSecProp = propRepo.get(SUBS_EXPIRY_INTERVAL_SEC_PROP, Integer.class)
+        this.subscriptionExpiryIntervalSecProp = repo.get(SUBS_EXPIRY_INTERVAL_SEC_PROP, Integer.class)
                 .orElse(5 * 60);
-        this.subsFetchQueryParamStr = propRepo.get(SUBS_FETCH_QUERY_PARAMS_STR_PROP, String.class)
+        this.subsFetchQueryParamStr = repo.get(SUBS_FETCH_QUERY_PARAMS_STR_PROP, String.class)
                 .orElse("");
-        this.discoveryApiHostnameProp = propRepo.get(DISCOVERY_API_HOSTNAME_PROP, String.class)
+        this.discoveryApiHostnameProp = repo.get(DISCOVERY_API_HOSTNAME_PROP, String.class)
                 .orElse("127.0.0.1");
-        this.discoveryApiPortProp = propRepo.get(DISCOVERY_API_PORT_PROP, Integer.class)
+        this.discoveryApiPortProp = repo.get(DISCOVERY_API_PORT_PROP, Integer.class)
                 .orElse(80);
 
         this.gzipEnabled =
-                propRepo.get(CHANNEL_GZIP_ENABLED_PROP, Boolean.class)
+                repo.get(CHANNEL_GZIP_ENABLED_PROP, Boolean.class)
                         .orElse(true);
         this.idleTimeoutSeconds =
-                propRepo.get(CHANNEL_IDLE_TIMEOUT_SEC_PROP, Integer.class)
+                repo.get(CHANNEL_IDLE_TIMEOUT_SEC_PROP, Integer.class)
                         .orElse(300);           // 5 minutes
         this.httpChunkSize =
-                propRepo.get(CHANNEL_HTTP_CHUNK_SIZE_BYTES_PROP, Integer.class)
+                repo.get(CHANNEL_HTTP_CHUNK_SIZE_BYTES_PROP, Integer.class)
                         .orElse(32768);         // 32 KiB
         this.writeTimeoutSeconds =
-                propRepo.get(CHANNEL_WRITE_TIMEOUT_SEC_PROP, Integer.class)
+                repo.get(CHANNEL_WRITE_TIMEOUT_SEC_PROP, Integer.class)
                         .orElse(1);
         this.flushIntervalMs =
-                propRepo.get(CHANNEL_FLUSH_INTERVAL_MSEC, Long.class)
+                repo.get(CHANNEL_FLUSH_INTERVAL_MSEC, Long.class)
                         .orElse(50L);
         this.flushIntervalBytes =
-                propRepo.get(CHANNEL_FLUSH_INTERVAL_BYTES, Integer.class)
+                repo.get(CHANNEL_FLUSH_INTERVAL_BYTES, Integer.class)
                         .orElse(512 * 1024);    // 500 KiB
         this.lowWriteBufferWatermark =
-                propRepo.get(CHANNEL_LOW_WRITE_BUFFER_WATERMARK_BYTES, Integer.class)
+                repo.get(CHANNEL_LOW_WRITE_BUFFER_WATERMARK_BYTES, Integer.class)
                         .orElse(1572864);       // 1.5 MiB
         this.highWriteBufferWatermark =
-                propRepo.get(CHANNEL_HIGH_WRITE_BUFFER_WATERMARK_BYTES, Integer.class)
+                repo.get(CHANNEL_HIGH_WRITE_BUFFER_WATERMARK_BYTES, Integer.class)
                         .orElse(2097152);       // 2 MiB
         this.ioThreads =
-                propRepo.get(CHANNEL_IO_THREADS, Integer.class)
+                repo.get(CHANNEL_IO_THREADS, Integer.class)
                         .orElse(1);
         this.compressionThreads =
-                propRepo.get(CHANNEL_COMPRESSION_THREADS, Integer.class)
+                repo.get(CHANNEL_COMPRESSION_THREADS, Integer.class)
                         .orElse(1);
 
         this.workerPoolCapacity =
-                propRepo.get(WORKER_POOL_CAPACITY_PROP, Integer.class)
+                repo.get(WORKER_POOL_CAPACITY_PROP, Integer.class)
                         .orElse(1000);
         this.workerPoolRefreshIntervalSec =
-                propRepo.get(WORKER_POOL_REFRESH_INTERVAL_SEC_PROP, Integer.class)
+                repo.get(WORKER_POOL_REFRESH_INTERVAL_SEC_PROP, Integer.class)
                         .orElse(10);
         this.workerPoolWorkerErrorQuota =
-                propRepo.get(WORKER_POOL_WORKER_ERROR_QUOTA_PROP, Integer.class)
+                repo.get(WORKER_POOL_WORKER_ERROR_QUOTA_PROP, Integer.class)
                         .orElse(60);
         this.workerPoolWorkerErrorTimeoutSec =
-                propRepo.get(WORKER_POOL_WORKER_ERROR_TIMEOUT_SEC, Integer.class)
+                repo.get(WORKER_POOL_WORKER_ERROR_TIMEOUT_SEC, Integer.class)
                         .orElse(300);
     }
 
