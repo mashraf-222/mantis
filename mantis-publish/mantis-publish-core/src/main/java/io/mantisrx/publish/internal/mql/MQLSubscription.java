@@ -136,12 +136,9 @@ public class MQLSubscription implements Subscription, Comparable {
         if (getClass() != obj.getClass())
             return false;
         MQLSubscription other = (MQLSubscription) obj;
-        if (this.query == null) {
-            if (other.query != null)
-                return false;
-        } else if (!query.equals(other.query))
-            return false;
-        return true;
+        final Query q = this.query;
+        final Query oq = other.query;
+        return q == oq || (q != null && q.equals(oq));
     }
 
     @Override
