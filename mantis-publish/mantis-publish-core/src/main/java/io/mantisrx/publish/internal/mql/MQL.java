@@ -34,6 +34,11 @@ public class MQL {
     private static IFn require = Clojure.var("io.mantisrx.mql.shaded.clojure.core", "require");
     private static IFn cljMakeQuery = Clojure.var("io.mantisrx.mql.jvm.interfaces.server", "make-query");
     private static IFn cljSuperset = Clojure.var("io.mantisrx.mql.jvm.interfaces.core", "queries->superset-projection");
+    private static final HashSet<String> CONTRADICTION_QUERIES = new HashSet<>(java.util.Arrays.asList(
+                "false",
+                "select * where false",
+                "select * from stream where false"
+        ));
 
     static {
         require.invoke(Clojure.read("io.mantisrx.mql.jvm.interfaces.server"));
@@ -67,8 +72,10 @@ public class MQL {
     }
 
     public static boolean isContradictionQuery(String query) {
-        return query.equals("false") ||
-                query.equals("select * where false") ||
-                query.equals("select * from stream where false");
+        if (query == null) {
+            // preserve original behavior which would throw a NullPointerException
+            throw new NullPointerException();
+        }
+        return CONTRADICTION_QUERIES.contains(query);
     }
 }
