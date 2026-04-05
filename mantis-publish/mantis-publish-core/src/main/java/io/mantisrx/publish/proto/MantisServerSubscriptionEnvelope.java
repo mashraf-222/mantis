@@ -57,9 +57,13 @@ public class MantisServerSubscriptionEnvelope {
 
     @Override
     public String toString() {
-        return "MantisServerSubscriptionEnvelope{"
-                + " subscriptionList=" + subscriptionList
-                + '}';
+        // Cache the string representation to avoid multiple toString() calls and reduce allocations
+        final String subs = String.valueOf(subscriptionList);
+        StringBuilder sb = new StringBuilder(32 + subs.length());
+        sb.append("MantisServerSubscriptionEnvelope{");
+        sb.append(" subscriptionList=").append(subs);
+        sb.append('}');
+        return sb.toString();
     }
 
 }
