@@ -26,11 +26,21 @@ public class MantisEvent {
     private final int id;
 
     private final String data;
+    private final String cachedToString;
 
     @JsonCreator
     public MantisEvent(@JsonProperty("id") int id, @JsonProperty("data") String data) {
         this.id = id;
         this.data = data;
+        // Precompute and cache the string representation since fields are immutable.
+        // This avoids repeated allocations and concatenations on toString calls.
+        int approxLen = 32 + (data == null ? 4 : data.length());
+        StringBuilder sb = new StringBuilder(approxLen);
+        sb.append("MantisEvent{");
+        sb.append("id=").append(id);
+        sb.append(", data='").append(data).append('\'');
+        sb.append('}');
+        this.cachedToString = sb.toString();
     }
 
     public int getId() {
@@ -65,9 +75,6 @@ public class MantisEvent {
 
     @Override
     public String toString() {
-        return "MantisEvent{" +
-                "id=" + id +
-                ", data='" + data + '\'' +
-                '}';
+        return cachedToString;
     }
 }
