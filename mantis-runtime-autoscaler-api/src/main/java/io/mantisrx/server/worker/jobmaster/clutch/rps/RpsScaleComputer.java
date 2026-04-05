@@ -28,22 +28,33 @@ public class RpsScaleComputer implements IScaleComputer {
         this.rpsConfig = rpsConfig;
     }
     public Double apply(ClutchConfiguration config, Long currentScale, Double delta) {
-        double scaleUpPct = rpsConfig.getScaleUpAbovePct() / 100.0;
-        double scaleDownPct = rpsConfig.getScaleDownBelowPct() / 100.0;
-        if (delta > -scaleDownPct && delta < scaleUpPct) {
+        double scaleUpPct = rpsConfig.getScaleUpAbovePct() * 0.01;
+        double scaleDownPct = rpsConfig.getScaleDownBelowPct() * 0.01;
+
+        // unbox delta once (will throw NPE like original if delta is null)
+        double d = delta;
+
+        if (d > -scaleDownPct && d < scaleUpPct) {
             return (double) currentScale;
         }
-        if (delta >= scaleUpPct) {
-            delta = delta * rpsConfig.getScaleUpMultiplier();
+        if (d >= scaleUpPct) {
+            d *= rpsConfig.getScaleUpMultiplier();
         }
-        if (delta <= -scaleDownPct) {
-            delta = delta * rpsConfig.getScaleDownMultiplier();
+        if (d <= -scaleDownPct) {
+            d *= rpsConfig.getScaleDownMultiplier();
         }
 
         // delta is a percentage, actual increase/decrease is computed as percentage of current scale.
-        double scale = Math.round(currentScale + currentScale * delta);
+        double current = currentScale.doubleValue();
+        double scale = Math.round(current + current * d);
 
-        scale = Math.min(config.getMaxSize(), Math.max(config.getMinSize(), scale));
+        double min = config.getMinSize();
+        double max = config.getMaxSize();
+        if (scale < min) {
+            scale = min;
+        } else if (scale > max) {
+            scale = max;
+        }
         return scale;
     }
 }
