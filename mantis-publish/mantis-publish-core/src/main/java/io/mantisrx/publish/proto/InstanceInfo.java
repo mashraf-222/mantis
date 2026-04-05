@@ -29,12 +29,21 @@ public class InstanceInfo {
     private final String clusterName;
     private final String autoScalingGroupName;
     private volatile InstanceStatus instanceStatus = InstanceStatus.UNKNOWN;
+    private final String toStringPrefix;
 
     public InstanceInfo(String applicationName, String zone, String clusterName, String autoScalingGroupName) {
         this.applicationName = applicationName;
         this.zone = zone;
         this.clusterName = clusterName;
         this.autoScalingGroupName = autoScalingGroupName;
+        // Build the invariant prefix once to avoid repeated allocations in toString().
+        StringBuilder sb = new StringBuilder(128);
+        sb.append("InstanceInfo{applicationName='").append(applicationName).append('\'')
+          .append(", zone='").append(zone).append('\'')
+          .append(", clusterName='").append(clusterName).append('\'')
+          .append(", autoScalingGroupName='").append(autoScalingGroupName).append('\'')
+          .append(", instanceStatus=");
+        this.toStringPrefix = sb.toString();
     }
 
     public String getApplicationName() {
@@ -79,13 +88,9 @@ public class InstanceInfo {
 
     @Override
     public String toString() {
-        return "InstanceInfo{" +
-            "applicationName='" + applicationName + '\'' +
-            ", zone='" + zone + '\'' +
-            ", clusterName='" + clusterName + '\'' +
-            ", autoScalingGroupName='" + autoScalingGroupName + '\'' +
-            ", instanceStatus=" + instanceStatus +
-            '}';
+        // Read volatile once into a local to avoid repeated volatile reads.
+        InstanceStatus current = instanceStatus;
+        return toStringPrefix + current + '}';
     }
 
     public enum InstanceStatus {
