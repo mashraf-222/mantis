@@ -65,9 +65,11 @@ public class Event {
     @Deprecated
     public Event(Map<String, Object> attributes, boolean deepCopy) {
         if (attributes == null || deepCopy) {
-            this.attributes = new HashMap<>();
-            if (attributes != null) {
-                this.attributes.putAll(attributes);
+            if (attributes == null) {
+                this.attributes = new HashMap<>();
+            } else {
+                // Use HashMap(Map) constructor to pre-size and copy entries efficiently.
+                this.attributes = new HashMap<>(attributes);
             }
         } else {
             this.attributes = attributes;
