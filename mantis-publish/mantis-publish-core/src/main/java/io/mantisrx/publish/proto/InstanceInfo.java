@@ -29,12 +29,20 @@ public class InstanceInfo {
     private final String clusterName;
     private final String autoScalingGroupName;
     private volatile InstanceStatus instanceStatus = InstanceStatus.UNKNOWN;
+    private final int cachedHash;
 
     public InstanceInfo(String applicationName, String zone, String clusterName, String autoScalingGroupName) {
         this.applicationName = applicationName;
         this.zone = zone;
         this.clusterName = clusterName;
         this.autoScalingGroupName = autoScalingGroupName;
+        // Compute a stable, null-safe hash using a standard 31-based combination.
+        int h = 1;
+        h = 31 * h + (this.applicationName == null ? 0 : this.applicationName.hashCode());
+        h = 31 * h + (this.zone == null ? 0 : this.zone.hashCode());
+        h = 31 * h + (this.clusterName == null ? 0 : this.clusterName.hashCode());
+        h = 31 * h + (this.autoScalingGroupName == null ? 0 : this.autoScalingGroupName.hashCode());
+        this.cachedHash = h;
     }
 
     public String getApplicationName() {
@@ -74,7 +82,7 @@ public class InstanceInfo {
 
     @Override
     public int hashCode() {
-        return Objects.hash(getApplicationName(), getZone(), getClusterName(), getAutoScalingGroupName());
+        return cachedHash;
     }
 
     @Override
