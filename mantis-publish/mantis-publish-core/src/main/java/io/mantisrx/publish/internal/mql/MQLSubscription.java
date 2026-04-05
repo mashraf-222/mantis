@@ -146,22 +146,26 @@ public class MQLSubscription implements Subscription, Comparable {
 
     @Override
     public int compareTo(final Object o) {
+        // Keep cast first to preserve original ClassCastException behavior when o isn't MQLSubscription
         MQLSubscription other = (MQLSubscription) o;
+        // Preserve original equals-based short-circuit: if queries are equal (as per equals), return 0
         if (this.equals(other)) {
             return 0;
         }
-        if (other != null) {
-            if (this.query.equals(other.query)) {
-                return 0;
-            } else {
-                int result = this.getSubscriptionId().compareTo(other.getSubscriptionId());
-                result = result == 0 ? this.getRawQuery().compareTo(other.getRawQuery()) : result;
-                // compareTo should confirm with equals,
-                // so return non-zero result if the subIds/query are same for the two queries
-                return result == 0 ? -1 : result;
-            }
-        } else {
+        if (other == null) {
             return -1;
+        } else {
+            // Compare subscriptionId first (cheap), only compare raw query when needed.
+            // Cache the values locally to avoid repeated method calls.
+            String thisSubId = this.getSubscriptionId();
+            String otherSubId = other.getSubscriptionId();
+            int result = thisSubId.compareTo(otherSubId);
+            if (result == 0) {
+                result = this.getRawQuery().compareTo(other.getRawQuery());
+            }
+            // compareTo should confirm with equals,
+            // so return non-zero result if the subIds/query are same for the two queries
+            return result == 0 ? -1 : result;
         }
     }
 
