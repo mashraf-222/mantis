@@ -26,6 +26,7 @@ public class MantisEvent {
     private final int id;
 
     private final String data;
+    private transient volatile int cachedSize = -1;
 
     @JsonCreator
     public MantisEvent(@JsonProperty("id") int id, @JsonProperty("data") String data) {
@@ -45,8 +46,15 @@ public class MantisEvent {
      * Estimate the size (in Bytes) of this object using the size of its fields.
      */
     public int size() {
-        return Integer.BYTES                // id
+        int s = cachedSize;
+        if (s != -1) {
+            return s;
+        }
+        // Compute once and cache result to avoid repeated allocations from data.getBytes()
+        int computed = Integer.BYTES                // id
                 + data.getBytes().length;   // data
+        cachedSize = computed;
+        return computed;
     }
 
     @Override
