@@ -54,8 +54,13 @@ public class MantisEvent {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         MantisEvent that = (MantisEvent) o;
-        return getId() == that.getId() &&
-                Objects.equals(getData(), that.getData());
+        // Quick primitive check first
+        if (id != that.id) return false;
+        // Local variable caching to avoid repeated field access
+        String thisData = this.data;
+        String thatData = that.data;
+        // Fast reference equality check, then null-safe equals
+        return thisData == thatData || (thisData != null && thisData.equals(thatData));
     }
 
     @Override
