@@ -61,9 +61,9 @@ public class MQL {
     }
 
     public static String preprocess(String criterion) {
-        return criterion.toLowerCase().equals("true") ? "select * where true" :
-                criterion.toLowerCase().equals("false") ? "select * where false" :
-                        criterion;
+        if (criterion.equalsIgnoreCase("true")) return "select * where true";
+        if (criterion.equalsIgnoreCase("false")) return "select * where false";
+        return criterion;
     }
 
     public static boolean isContradictionQuery(String query) {
