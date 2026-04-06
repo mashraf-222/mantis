@@ -61,10 +61,10 @@ public class QueryRegistry {
     }
 
     public boolean deregisterQuery(String targetApp, String subId, String query) {
-        appToSubscriptionMap.computeIfPresent(targetApp, (k, v) -> {
-            v.deregisterQuery(subId, query);
-            return v;
-        });
+        QueryMap qm = appToSubscriptionMap.get(targetApp);
+        if (qm != null) {
+            qm.deregisterQuery(subId, query);
+        }
 
         return true;
     }
