@@ -68,6 +68,11 @@ public class WorkerAssignments {
 
     @Override
     public String toString() {
-        return "WorkerAssignments [stage=" + stage + ", numWorkers=" + numWorkers + ", hosts=" + hosts + "]";
+        StringBuilder sb = new StringBuilder(64);
+        sb.append("WorkerAssignments [stage=").append(stage)
+          .append(", numWorkers=").append(numWorkers)
+          .append(", hosts=").append(hosts)
+          .append("]");
+        return sb.toString();
     }
 }
