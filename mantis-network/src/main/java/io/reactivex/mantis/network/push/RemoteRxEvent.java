@@ -87,8 +87,12 @@ public class RemoteRxEvent {
 
     @Override
     public String toString() {
-        return "RemoteRxEvent [name=" + name + ", type=" + type
-                + ", subscriptionParameters=" + subscriptionParameters + "]";
+        StringBuilder sb = new StringBuilder(64);
+        sb.append("RemoteRxEvent [name=").append(name)
+          .append(", type=").append(type)
+          .append(", subscriptionParameters=").append(subscriptionParameters)
+          .append("]");
+        return sb.toString();
     }
 
     public enum Type {
