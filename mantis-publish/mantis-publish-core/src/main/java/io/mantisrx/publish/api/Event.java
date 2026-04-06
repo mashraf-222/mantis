@@ -119,12 +119,20 @@ public class Event {
     }
 
     public Map<String, String> toStringMap() {
-        final Map<String, String> m = new HashMap<>();
+        // Cache the entry set and pre-size the result map to avoid rehash/resizes.
+        final Set<Map.Entry<String, Object>> entries = this.entries();
+        final int expected = entries.size();
+        final int initialCapacity = (expected == 0) ? 1 : (int)(expected / 0.75f) + 1;
+        final Map<String, String> m = new HashMap<>(initialCapacity);
 
-        for (Map.Entry<String, Object> entry : this.entries()) {
+        for (Map.Entry<String, Object> entry : entries) {
             final Object val = entry.getValue();
             if (val != null) {
-                m.put(entry.getKey(), String.valueOf(val));
+                // Avoid calling String.valueOf for values that are already Strings to save work,
+                // but use String.valueOf for all other types to preserve original semantics
+                // (e.g., handling of char[] and other special cases).
+                final String s = (val instanceof String) ? (String) val : String.valueOf(val);
+                m.put(entry.getKey(), s);
             }
         }
 
