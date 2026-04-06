@@ -54,7 +54,12 @@ public class Event {
     }
 
     public Event(Map<String, Object> attributes) {
-        this(attributes, true);
+        // Default behavior: always deep copy (create a new top-level Map)
+        if (attributes == null) {
+            this.attributes = new HashMap<>();
+        } else {
+            this.attributes = new HashMap<>(attributes);
+        }
     }
 
     /**
@@ -65,10 +70,8 @@ public class Event {
     @Deprecated
     public Event(Map<String, Object> attributes, boolean deepCopy) {
         if (attributes == null || deepCopy) {
-            this.attributes = new HashMap<>();
-            if (attributes != null) {
-                this.attributes.putAll(attributes);
-            }
+            // Use HashMap copy constructor when attributes is non-null to avoid an extra putAll loop.
+            this.attributes = (attributes == null) ? new HashMap<>() : new HashMap<>(attributes);
         } else {
             this.attributes = attributes;
         }
@@ -136,7 +139,8 @@ public class Event {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Event event = (Event) o;
-        return Objects.equals(attributes, event.attributes);
+        // attributes are non-null by construction in this class, so short-circuit reference equality first.
+        return attributes == event.attributes || attributes.equals(event.attributes);
     }
 
     @Override
