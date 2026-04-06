@@ -37,6 +37,9 @@ public class WorkerAssignments {
     public WorkerAssignments(@JsonProperty("stage") Integer stage,
                              @JsonProperty("numWorkers") Integer numWorkers,
                              @JsonProperty("hosts") Map<Integer, WorkerHost> hosts) {
+        // Fail fast with same exception type (NullPointerException) if boxed Integers are null.
+        java.util.Objects.requireNonNull(stage);
+        java.util.Objects.requireNonNull(numWorkers);
         this.stage = stage;
         this.numWorkers = numWorkers;
         this.hosts = hosts;
