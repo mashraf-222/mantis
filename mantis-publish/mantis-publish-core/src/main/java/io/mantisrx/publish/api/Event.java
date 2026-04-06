@@ -141,7 +141,10 @@ public class Event {
 
     @Override
     public int hashCode() {
-        return Objects.hash(attributes);
+        // Objects.hash(attributes) allocates a single-element Object[] and loops;
+        // compute equivalent value directly to avoid allocations and reduce CPU.
+        int attrHash = (attributes == null) ? 0 : attributes.hashCode();
+        return 31 + attrHash;
     }
 
     @Override
