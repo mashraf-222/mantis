@@ -62,9 +62,22 @@ public class MantisServerSubscription {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         final MantisServerSubscription that = (MantisServerSubscription) o;
-        return Objects.equals(query, that.query) &&
-                Objects.equals(subscriptionId, that.subscriptionId) &&
-                Objects.equals(additionalParams, that.additionalParams);
+        // Check subscriptionId first (likely to differ) to fail fast
+        if (subscriptionId != null) {
+            if (!subscriptionId.equals(that.subscriptionId)) return false;
+        } else if (that.subscriptionId != null) {
+            return false;
+        }
+        // Then check query
+        if (query != null) {
+            if (!query.equals(that.query)) return false;
+        } else if (that.query != null) {
+            return false;
+        }
+        // Finally check additionalParams, use reference equality as a fast path
+        if (additionalParams == that.additionalParams) return true;
+        if (additionalParams != null) return additionalParams.equals(that.additionalParams);
+        return that.additionalParams == null;
     }
 
     @Override
