@@ -39,12 +39,21 @@ import org.apache.iceberg.exceptions.RuntimeIOException;
  * such as {@link Record}s and {@link DataFile}s.
  */
 public class IcebergCodecs {
+    private static final java.util.concurrent.ConcurrentHashMap<Schema, Codec<Record>> RECORD_CACHE =
+            new java.util.concurrent.ConcurrentHashMap<>();
+
 
     /**
      * @return a codec for encoding/decoding Iceberg Records.
      */
     public static Codec<Record> record(Schema schema) {
-        return new RecordCodec<>(schema);
+        if (schema == null) {
+            // Preserve original behavior: if null schema was previously allowed and resulted
+            // in a fresh RecordCodec, keep returning a new instance for null.
+            return new RecordCodec<>(null);
+        }
+        // Reuse existing codec for the schema when available to reduce allocations.
+        return RECORD_CACHE.computeIfAbsent(schema, s -> new RecordCodec<>(s));
     }
 
     public static Codec<MantisRecord> mantisRecord(Schema schema) {
