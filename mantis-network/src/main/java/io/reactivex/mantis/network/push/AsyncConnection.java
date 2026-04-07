@@ -38,6 +38,7 @@ public class AsyncConnection<T> {
 
     private Observer<List<byte[]>> subject;
     private Func1<T, Boolean> predicate;
+    private volatile String cachedToString;
 
     public AsyncConnection(String host, int port, String id,
                            String slotId,
@@ -98,9 +99,19 @@ public class AsyncConnection<T> {
 
     @Override
     public String toString() {
-        return "AsyncConnection [host=" + host + ", port=" + port
-            + ", groupId=" + groupId + ", slotId=" + slotId + ", id=" + id
-            + "]";
+        String s = cachedToString;
+        if (s == null) {
+            StringBuilder sb = new StringBuilder(64);
+            sb.append("AsyncConnection [host=").append(host)
+              .append(", port=").append(port)
+              .append(", groupId=").append(groupId)
+              .append(", slotId=").append(slotId)
+              .append(", id=").append(id)
+              .append("]");
+            s = sb.toString();
+            cachedToString = s;
+        }
+        return s;
     }
 
     @Override
