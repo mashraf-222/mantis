@@ -32,8 +32,9 @@ public class SpectatorUtils {
     }
 
     public static AtomicDouble buildAndRegisterGauge(Registry registry, String name) {
-        Id id = registry.createId(name);
-        return PolledMeter.using(registry).withId(id).monitorValue(new AtomicDouble());
+        final AtomicDouble value = new AtomicDouble();
+        final Id id = registry.createId(name);
+        return PolledMeter.using(registry).withId(id).monitorValue(value);
     }
 
     public static Timer buildAndRegisterTimer(Registry registry, String name) {
